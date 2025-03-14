@@ -1,0 +1,7 @@
+.env
+*.log
+jobs/data/birthdays.txt
+jobs/__pycache__/
+__pycache__/
+.venv/
+*.pyc
