@@ -1,6 +1,7 @@
 .env
 jobs/data/*.log
 jobs/data/birthdays.txt
+jobs/data/urls_minzdrav.json
 jobs/__pycache__/
 __pycache__/
 .venv/
