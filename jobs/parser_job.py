@@ -36,7 +36,6 @@ async def check_sites(context: CallbackContext) -> None:
     '''
 
     urls = from_json("jobs/data/urls.json")
-    urls_minzdrav = from_json("jobs/data/urls_minzdrav.json")
     failed_checks = [] # записывается информация о каждой неудачной проверке каждого сайта
     text = '' # текст для записи в БД
     check_result = True # флаг для отслеживания результата проверки и записи в БД
@@ -71,21 +70,6 @@ async def check_sites(context: CallbackContext) -> None:
                 error = str(error)
 
                 failed_checks.append(f'{url} -> {error};')
-
-        for name in urls_minzdrav.keys():
-            try:
-                url_minzdrav = urls_minzdrav.get(name).get('url')
-
-                async with session.get(url_minzdrav, headers=HEADERS, ssl=False) as response:
-                    response.raise_for_status()
-
-            except requests.exceptions.HTTPError as error:
-                error = str(error)
-                failed_checks.append(f'{url_minzdrav} -> {error};')
-
-            except Exception as error:
-                error = str(error)
-                failed_checks.append(f'{url_minzdrav} -> {error};')
 
     time_now = datetime.now() + timedelta(hours=7)
 
