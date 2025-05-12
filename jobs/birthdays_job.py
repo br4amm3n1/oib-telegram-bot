@@ -7,13 +7,13 @@ from telegram.ext import CommandHandler, MessageHandler, ConversationHandler, Ca
 NAME, SURNAME, BIRTHDAY = range(3)
 
 def save_user_data(user_id: int, name: str, surname: str, birthday: str) -> None:
-    with open("jobs/data/birthdays.txt", "a") as file:
+    with open("jobs/data/birthdays.txt", "a", encoding='utf-8') as file:
         file.write(f"{user_id},{name},{surname},{birthday}\n")
 
 
 def load_user_data() -> list:
     try:
-        with open("jobs/data/birthdays.txt", "r") as file:
+        with open("jobs/data/birthdays.txt", "r", encoding='utf-8') as file:
             return [line.strip().split(",") for line in file.readlines()]
     except FileNotFoundError:
         return []
@@ -27,7 +27,7 @@ def remove_user_data(user_id: int) -> bool:
     else:
         return False
 
-    with open("jobs/data/birthdays.txt", "w") as file:
+    with open("jobs/data/birthdays.txt", "w", encoding='utf-8') as file:
         for user in updated_data:
             file.write(",".join(user) + "\n")
 

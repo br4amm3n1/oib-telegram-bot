@@ -37,8 +37,10 @@ async def set_commands(app: Application) -> None:
 async def post_init(application: Application) -> None:
     #Сервер Telegram находится в часовом поясе UTC+7, значит нужно вычитать 7 часов из необходимого времени уведомления
     time =  datetime.time(hour=5, minute=0, second=0)
+    time_to_check_email = datetime.time(hour=0, minute=10, second=0)
 
-    application.job_queue.run_repeating(check_email_job, interval=3600, first=0)
+    # application.job_queue.run_repeating(check_email_job, interval=3600, first=0)
+    application.job_queue.run_daily(check_email_job, time_to_check_email)
     application.job_queue.run_repeating(check_birthdays, interval=86400, first=0)
     application.job_queue.run_repeating(check_sites, interval=14400, first=0)
     # application.job_queue.run_repeating(send_notifications_for_sites_checking, interval=80, first=0)
