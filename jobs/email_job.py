@@ -20,33 +20,36 @@ async def check_email_job(context: CallbackContext) -> None:
     :param context: CallbackContext
     :return: None
     '''
+    mail_catalogs = ['INBOX', 'INBOX/check_minzdrav']
     mail = imaplib.IMAP4_SSL(IMAP_SERVER)
     mail.login(LOGIN, PASSWORD)
-    mail.select('INBOX')
 
-    status, messages = mail.search(None, 'UNSEEN')
-    message_ids = messages[0].split()
+    for catalog in mail_catalogs:
+        mail.select(catalog)
 
-    for msg_id in message_ids:
-        status, msg_data = mail.fetch(msg_id, '(RFC822)')
+        status, messages = mail.search(None, 'UNSEEN')
+        message_ids = messages[0].split()
 
-        for response_part in msg_data:
-            if isinstance(response_part, tuple):
-                msg = email.message_from_bytes(response_part[1], policy=policy.default)
+        for msg_id in message_ids:
+            status, msg_data = mail.fetch(msg_id, '(RFC822)')
 
-                subject = msg['subject']
-                from_ = msg['from']
-                date = msg['date']
-                body = ""
+            for response_part in msg_data:
+                if isinstance(response_part, tuple):
+                    msg = email.message_from_bytes(response_part[1], policy=policy.default)
 
-                if msg.is_multipart():
-                    for part in msg.walk():
-                        if part.get_content_type() == 'text/plain':
-                            body = part.get_payload(decode=True).decode()
-                else:
-                    body = msg.get_payload(decode=True).decode()
+                    subject = msg['subject']
+                    from_ = msg['from']
+                    date = msg['date']
+                    body = ""
 
-                message_text = f"НОВОЕ ПИСЬМО:\n\n\nОт: {from_}\nТема: {subject}\nДата: {date}\n\n{body}"
-                await context.bot.send_message(chat_id=CHAT_ID, text=message_text)
+                    if msg.is_multipart():
+                        for part in msg.walk():
+                            if part.get_content_type() == 'text/plain':
+                                body = part.get_payload(decode=True).decode()
+                    else:
+                        body = msg.get_payload(decode=True).decode()
+
+                    message_text = f"НОВОЕ ПИСЬМО:\n\n\nОт: {from_}\nТема: {subject}\nДата: {date}\n\n{body}"
+                    await context.bot.send_message(chat_id=CHAT_ID, text=message_text)
 
     mail.logout()
