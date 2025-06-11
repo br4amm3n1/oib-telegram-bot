@@ -35,30 +35,34 @@ def compare_dates(date: str) -> str:
 
     return ""
 
+
 async def check_expiry_date_of_ds(context: CallbackContext) -> None:
     ds_csv = pd.read_csv('jobs/data/ds_info.csv', encoding='utf-8', sep=';')
     ds_csv_clean = ds_csv.dropna(subset=['Окончание действия сертификата']).copy()
 
-    def format_row(row):
+    expired_rows = []
+
+    def process_row(row):
         expiry_date = row['Окончание действия сертификата']
         result = compare_dates(expiry_date)
 
         if result:
-            return (
+            expired_rows.append(
                 f"| {row['ФИО'][:40]:<40} | "
                 f"{row['Подразделение'][:18]:<18} | "
                 f"{expiry_date[:10]:<15} | "
                 f"{result:<15} |"
             )
 
-    header = "| ФИО                                  | Подразделение      | Срок окончания | Статус          |\n"
-    separator = "|--------------------------------------|--------------------|-----------------|-----------------|\n"
+    ds_csv_clean.apply(process_row, axis=1)
 
-    table_rows = ds_csv_clean.apply(format_row, axis=1).str.cat(sep="\n")
-    text_message = f"```\n{header}{separator}{table_rows}\n```"
+    if expired_rows:
+        header = "| ФИО                                  | Подразделение      | Срок окончания | Статус          |\n"
+        separator = "|--------------------------------------|--------------------|-----------------|-----------------|\n"
+        text_message = f"```\n{header}{separator}{'\n'.join(expired_rows)}\n```"
 
-    await context.bot.send_message(
-        chat_id=CHAT_ID,
-        text=text_message,
-        parse_mode='MarkdownV2'
-    )
+        await context.bot.send_message(
+            chat_id=CHAT_ID,
+            text=text_message,
+            parse_mode='MarkdownV2'
+        )
