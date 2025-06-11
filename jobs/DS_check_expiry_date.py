@@ -45,14 +45,14 @@ async def check_expiry_date_of_ds(context: CallbackContext) -> None:
 
         if result:
             return (
-                f"| {row['ФИО'][:18]:<18} | "
+                f"| {row['ФИО'][:40]:<40} | "
                 f"{row['Подразделение'][:18]:<18} | "
                 f"{expiry_date[:10]:<15} | "
                 f"{result:<15} |"
             )
 
-    header = "| ФИО                | Подразделение      | Срок окончания | Статус          |\n"
-    separator = "|--------------------|--------------------|-----------------|-----------------|\n"
+    header = "| ФИО                                  | Подразделение      | Срок окончания | Статус          |\n"
+    separator = "|--------------------------------------|--------------------|-----------------|-----------------|\n"
 
     table_rows = ds_csv_clean.apply(format_row, axis=1).str.cat(sep="\n")
     text_message = f"```\n{header}{separator}{table_rows}\n```"
