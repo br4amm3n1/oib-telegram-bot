@@ -58,10 +58,7 @@ async def check_expiry_date_of_ds(context: CallbackContext) -> None:
 
     if expired_rows:
         header = "ИСТЕКАЮЩИЕ СЕРТИФИКАТЫ 📑:\n\n"
-        text_message = ""
-
-        for expired_row in expired_rows:
-            text_message += f"{expired_row}\n"
+        text_message = f"{header}{'\n'.join(expired_rows)}"
 
         await context.bot.send_message(
             chat_id=CHAT_ID,
