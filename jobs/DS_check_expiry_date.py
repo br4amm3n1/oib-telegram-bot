@@ -15,8 +15,8 @@ def compare_dates(date: str) -> str:
     in_2_week = today + timedelta(days=14)
     next_month = today + relativedelta(months=1)
 
-    in_2_week_str = in_2_week.strftime("%d.%m")
-    next_month_str = next_month.strftime("%d.%m")
+    in_2_week_str = in_2_week.strftime("%d.%m.%Y")
+    next_month_str = next_month.strftime("%d.%m.%Y")
 
     periods = {
         "in_2_week_str": in_2_week_str,
@@ -24,7 +24,7 @@ def compare_dates(date: str) -> str:
     }
 
     expiry_date = datetime.strptime(date, "%d.%m.%Y").date()
-    expiry_date_str = expiry_date.strftime("%d.%m")
+    expiry_date_str = expiry_date.strftime("%d.%m.%Y")
 
     for name, period in periods.items():
         if expiry_date_str == period:
@@ -48,21 +48,22 @@ async def check_expiry_date_of_ds(context: CallbackContext) -> None:
 
         if result:
             expired_rows.append(
-                f"| {row['ФИО'][:40]:<40} | "
-                f"{row['Подразделение'][:18]:<18} | "
-                f"{expiry_date[:10]:<15} | "
-                f"{result:<15} |"
+                f"У {row['ФИО']} из "
+                f"{row['Подразделение']} сертификат истекает "
+                f"📅{expiry_date[:10]} "
+                f"({result})"
             )
 
     ds_csv_clean.apply(process_row, axis=1)
 
     if expired_rows:
-        header = "| ФИО                                  | Подразделение      | Срок окончания | Статус          |\n"
-        separator = "|--------------------------------------|--------------------|-----------------|-----------------|\n"
-        text_message = f"```\n{header}{separator}{'\n'.join(expired_rows)}\n```"
+        header = "ИСТЕКАЮЩИЕ СЕРТИФИКАТЫ 📑:\n\n"
+        text_message = ""
+
+        for expired_row in expired_rows:
+            text_message += f"{expired_row}\n"
 
         await context.bot.send_message(
             chat_id=CHAT_ID,
-            text=text_message,
-            parse_mode='MarkdownV2'
+            text=header + text_message,
         )
