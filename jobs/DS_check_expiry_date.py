@@ -62,5 +62,5 @@ async def check_expiry_date_of_ds(context: CallbackContext) -> None:
 
         await context.bot.send_message(
             chat_id=CHAT_ID,
-            text=header + text_message,
+            text=text_message,
         )
