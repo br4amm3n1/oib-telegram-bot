@@ -66,11 +66,6 @@ async def check_sites(context: CallbackContext) -> None:
             except ssl.SSLCertVerificationError:
                 failed_checks.append(f'{url} -> Проверка SSL сертификата завершилась неудачно.;')
 
-            except Exception as error:
-                error = str(error)
-
-                failed_checks.append(f'{url} -> {error};')
-
     time_now = datetime.now() + timedelta(hours=7)
 
     if len(failed_checks) == 0:
@@ -111,6 +106,7 @@ async def send_notifications_for_sites_checking(context: CallbackContext) -> Non
                 query = '''
                 SELECT * FROM Checks
                 WHERE create_time >= ?
+                LIMIT 5
                 '''
 
                 cursor.execute(query, (time_day_ago,))
