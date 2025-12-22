@@ -1,22 +1,21 @@
-FROM python:3
+FROM python:3.13-alpine
 
 WORKDIR /usr/src/oibbot
 
-ADD jobs ./jobs
+RUN apk add --no-cache nano
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    EDITOR=nano \
+    LANG=C.UTF-8 \
+    LC_ALL=C.UTF-8
 
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-RUN apt-get update && apt-get install -y nano && apt-get install -y locales nano && \
-apt-get clean
+RUN pip install --no-cache-dir --upgrade pip \
+    && pip install --no-cache-dir -r requirements.txt
 
-RUN sed -i '/ru_RU.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-
-ENV LANG=ru_RU.UTF-8
-ENV LANGUAGE=ru_RU:ru
-ENV LC_ALL=ru_RU.UTF-8
-ENV EDITOR=nano
-
+ADD jobs ./jobs
 COPY bot.py ./
 COPY .env ./
 
-CMD [ "python", "./bot.py" ]
+CMD ["python", "./bot.py"]
