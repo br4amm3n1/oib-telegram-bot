@@ -3,7 +3,6 @@ jobs/data/*.log
 jobs/data/birthdays.txt
 jobs/data/check_info_sites.db
 jobs/data/urls.json
-jobs/data/ds_info.csv
 jobs/__pycache__/
 __pycache__/
 .venv/
