@@ -14,7 +14,7 @@
   },
   "medgenetics": {
     "url": "https://www.medgenetics.ru/",
-    "css-selector": ["body main div h1", "<h1 class=\"pb8\">НИИ <br/>медицинской <br/>генетики</h1>"]
+    "css-selector": ["body section.d-flex.align-items-center.flex-row.sectionmain div.container.blackT.mw900 h1", "<h1 class=\"pb8\">НИИ <br/>медицинской <br/>генетики</h1>"]
   },
   "mental-health": {
     "url": "http://mental-health.ru/",
