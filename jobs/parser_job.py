@@ -106,7 +106,7 @@ async def send_notifications_for_sites_checking(context: CallbackContext) -> Non
                 query = '''
                 SELECT * FROM Checks
                 WHERE create_time >= ?
-                LIMIT 5
+                LIMIT 6
                 '''
 
                 cursor.execute(query, (time_day_ago,))
