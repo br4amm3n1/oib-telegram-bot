@@ -7,7 +7,6 @@ import logging
 import aiohttp
 import os
 
-import requests.exceptions
 from bs4 import BeautifulSoup
 from fake_useragent import UserAgent
 
@@ -24,6 +23,11 @@ HEADERS = {
     'Accept': "text/html",
     'User-Agent': UserAgent().random
 }
+
+
+def format_datetime_for_db(dt: datetime) -> str:
+    """Форматирует datetime в строку для SQLite"""
+    return dt.strftime('%Y-%m-%d %H:%M:%S.%f')[:26]
 
 
 async def check_sites(context: CallbackContext) -> None:
@@ -94,74 +98,46 @@ async def send_notifications_for_sites_checking(context: CallbackContext) -> Non
     :param context: CallbackContext
     :return: None
     '''
-    time_day_ago = datetime.now() + timedelta(hours=7) - timedelta(hours=24)
-    query_result = []
+    time_day_ago = datetime.now() + timedelta(hours=7) - timedelta(hours=4)
+    time_for_db = format_datetime_for_db(time_day_ago)
+    query_result: tuple
 
     with sqlite3.connect('jobs/data/check_info_sites.db') as connection:
         cursor = connection.cursor()
 
         try:
             with connection:
-                # выборка из БД проверок, проведенных за последние 24 часа, начиная с отправки уведомления
+                # выборка из БД провальной проверки, проведенной за последние 4 часа
                 query = '''
                 SELECT * FROM Checks
-                WHERE create_time >= ?
-                LIMIT 6
+                WHERE create_time >= ? AND result = 0
                 '''
 
-                cursor.execute(query, (time_day_ago,))
-                query_result = cursor.fetchall()
+                cursor.execute(query, (time_for_db,))
+                query_result = cursor.fetchone()
 
         except Exception as ex:
             logging.warning(f"{str(ex)}")
 
-    checks_results = []
+    time_of_check = query_result[3]
+    time_of_check_str = f"{time_of_check[:-7]}\n"
 
-    for row in query_result:
-        checks_results.append(bool(row[1]))
+    check_result_str = ''
 
-    overall_result = all(checks_results)
+    # строка такого формата на входе https://инфарктанет.рф/ -> list index out of range;
+    # https://finfarktanet.ru/ -> Cannot connect to host finfarktanet.ru:443 ssl:False [getaddrinfo failed];
+    # https://tnimc.ru/ -> Элемент не найден;
+    prep_check_result = query_result[2].split(';')[:-1]
+    prev_str = f'Проверка {time_of_check_str}: ❌\n'
 
-    count_of_checks = len(query_result)
-    time_of_checks = [row[3] for row in query_result]
-    time_of_checks_str = ''
+    check_result_str += prev_str
 
-    for index in range(len(time_of_checks)):
-        time_of_checks_str += f"{str(index + 1)}. {time_of_checks[index][:-7]}\n"
+    for index in range(len(prep_check_result)):
+        check_result_str += f"{str(index + 1)}. {prep_check_result[index]}\n"
 
-    if overall_result:
-        text = (f"Количество проверок: {count_of_checks}\n"
-                f"Время проверок:\n{time_of_checks_str}\n"
-                f"Результат: ✅")
+    text = f"Результат:\n{check_result_str}"
 
-        await context.bot.send_message(chat_id=CHAT_ID, text=text)
-    else:
-        warnings = 0
-        check_result_str = ''
-
-        for row in query_result:
-            if bool(row[1]) is False:
-                warnings += 1
-
-        for index in range(len(query_result)):
-            if bool(query_result[index][1]) is False:
-                # строка такого формата на входе https://инфарктанет.рф/ -> list index out of range;
-                # https://finfarktanet.ru/ -> Cannot connect to host finfarktanet.ru:443 ssl:False [getaddrinfo failed];
-                # https://tnimc.ru/ -> Элемент не найден;
-                prep_check_result = query_result[index][2].split(';')[:-1]
-                prev_str = f'Проверка {str(index + 1)}: ❌\n'
-
-                check_result_str += prev_str
-
-                for jndex in range(len(prep_check_result)):
-                    check_result_str += f"{str(jndex + 1)}. {prep_check_result[jndex]}\n"
-
-        text = (f"Количество проверок: {count_of_checks}\n"
-                f"Количество успешных проверок: {count_of_checks - warnings}\n"
-                f"Время проверок:\n{time_of_checks_str}\n"
-                f"Результат:\n{check_result_str}")
-
-        await context.bot.send_message(chat_id=CHAT_ID, text=text, disable_web_page_preview=True)
+    await context.bot.send_message(chat_id=CHAT_ID, text=text, disable_web_page_preview=True)
 
 
 def from_json(filename: str) -> dict:
