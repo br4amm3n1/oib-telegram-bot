@@ -119,25 +119,26 @@ async def send_notifications_for_sites_checking(context: CallbackContext) -> Non
         except Exception as ex:
             logging.warning(f"{str(ex)}")
 
-    time_of_check = query_result[3]
-    time_of_check_str = f"{time_of_check[:-7]}\n"
+    if query_result:
+        time_of_check = query_result[3]
+        time_of_check_str = f"{time_of_check[:-7]}\n"
 
-    check_result_str = ''
+        check_result_str = ''
 
-    # строка такого формата на входе https://инфарктанет.рф/ -> list index out of range;
-    # https://finfarktanet.ru/ -> Cannot connect to host finfarktanet.ru:443 ssl:False [getaddrinfo failed];
-    # https://tnimc.ru/ -> Элемент не найден;
-    prep_check_result = query_result[2].split(';')[:-1]
-    prev_str = f'Проверка {time_of_check_str}: ❌\n'
+        # строка такого формата на входе https://инфарктанет.рф/ -> list index out of range;
+        # https://finfarktanet.ru/ -> Cannot connect to host finfarktanet.ru:443 ssl:False [getaddrinfo failed];
+        # https://tnimc.ru/ -> Элемент не найден;
+        prep_check_result = query_result[2].split(';')[:-1]
+        prev_str = f'Проверка {time_of_check_str}: ❌\n'
 
-    check_result_str += prev_str
+        check_result_str += prev_str
 
-    for index in range(len(prep_check_result)):
-        check_result_str += f"{str(index + 1)}. {prep_check_result[index]}\n"
+        for index in range(len(prep_check_result)):
+            check_result_str += f"{str(index + 1)}. {prep_check_result[index]}\n"
 
-    text = f"Результат:\n{check_result_str}"
+        text = f"Результат:\n{check_result_str}"
 
-    await context.bot.send_message(chat_id=CHAT_ID, text=text, disable_web_page_preview=True)
+        await context.bot.send_message(chat_id=CHAT_ID, text=text, disable_web_page_preview=True)
 
 
 def from_json(filename: str) -> dict:
