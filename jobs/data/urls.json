@@ -9,8 +9,8 @@
   },
   "infarktanetNET": {
     "url": "https://infarkta.net/",
-    "css-selector": ["body footer div div.row.info_footer div.col-md-4.col-sm-6.logobut div.textbuttom div:nth-child(1)",
-      "<div class=\"text-light\">Тюменский кардиологический научный центр</div>"]
+    "css-selector": ["body footer div div.row.info_footer div.col-md-4.col-sm-6.logobut div img",
+      "<img height=\"auto\" src=\"/images/tnimc_newlogo.png\" width=\"350\"/>"]
   },
   "medgenetics": {
     "url": "https://www.medgenetics.ru/",
