@@ -46,19 +46,19 @@ async def check_sites(context: CallbackContext) -> None:
     check_result = True # флаг для отслеживания результата проверки и записи в БД
 
     async def check_one_site(site_name: str) -> None:
-        try:
-            url = urls.get(site_name).get('url')
+        url = urls.get(site_name).get('url')
 
+        try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=HEADERS, ssl=False) as response:
                     response.raise_for_status()
                     html_page = await response.text()
 
                     soup = BeautifulSoup(html_page, 'lxml')
-                    result = soup.select(urls.get(name).get('css-selector')[0])
+                    result = soup.select(urls.get(site_name).get('css-selector')[0])
 
                     if len(result) > 0:
-                        if str(result[0]) != urls.get(name).get('css-selector')[1]:
+                        if str(result[0]) != urls.get(site_name).get('css-selector')[1]:
                             failed_checks.append(f'{url} -> Элемент не найден;')
                     else:
                         failed_checks.append(f'{url} -> Элемент не найден;')
