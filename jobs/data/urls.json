@@ -1,12 +1,4 @@
 {
-  "infarktanetRF": {
-    "url": "https://инфарктанет.рф/",
-    "css-selector": ["div.main h1 span", "<span> ЭКГ + УЗИ сердца + консультация кардиолога </span>"]
-  },
-  "infarktanetRU": {
-    "url": "https://infarktanet.ru/",
-    "css-selector": ["div.sectionForm__bottom.row h5", "<h5>Тюмень, ул. Мельникайте, 111</h5>"]
-  },
   "infarktanetNET": {
     "url": "https://infarkta.net/",
     "css-selector": ["body footer div div.row.info_footer div.col-md-4.col-sm-6.logobut div img",
