@@ -46,7 +46,7 @@ async def post_init(application: Application) -> None:
 
     # application.job_queue.run_repeating(check_email_job, interval=3600, first=0)
     application.job_queue.run_daily(check_email_job, time_to_check_email)
-    application.job_queue.run_daily(check_expiry_date_of_ds, time_to_check_ds_expiry_date)
+    # application.job_queue.run_daily(check_expiry_date_of_ds, time_to_check_ds_expiry_date)
     application.job_queue.run_daily(notify_about_work_status, time_to_send_notification)
 
     application.job_queue.run_repeating(check_birthdays, interval=86400, first=0)
@@ -59,8 +59,7 @@ async def post_init(application: Application) -> None:
 
 @private_chat
 async def start(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text("Привет, я бот отдела информационной безопасности Томского НИМЦ.\n\n"
-                                    "Для подписки на уведомления о днях рождений своих коллег введите "
+    await update.message.reply_text("Привет, для подписки на уведомления о днях рождений своих коллег введите "
                                     "команду /menu или воспользуйтесь меню слева от поля ввода сообщения.\n"
                                     "Если нужно прервать заполнение данных, введите /cancel.")
 
