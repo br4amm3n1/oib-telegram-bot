@@ -5,6 +5,7 @@ import json
 import logging
 
 import aiohttp
+import asyncio
 import os
 
 from bs4 import BeautifulSoup
@@ -44,11 +45,11 @@ async def check_sites(context: CallbackContext) -> None:
     text = '' # текст для записи в БД
     check_result = True # флаг для отслеживания результата проверки и записи в БД
 
-    async with aiohttp.ClientSession() as session:
-        for name in urls.keys():
-            try:
-                url = urls.get(name).get('url')
+    async def check_one_site(site_name: str) -> None:
+        try:
+            url = urls.get(site_name).get('url')
 
+            async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=HEADERS, ssl=False) as response:
                     response.raise_for_status()
                     html_page = await response.text()
@@ -62,13 +63,15 @@ async def check_sites(context: CallbackContext) -> None:
                     else:
                         failed_checks.append(f'{url} -> Элемент не найден;')
 
-            except aiohttp.ClientError as http_error:
-                http_error = str(http_error)
+        except aiohttp.ClientError as http_error:
+            http_error = str(http_error)
 
-                failed_checks.append(f'{url} -> {http_error};')
+            failed_checks.append(f'{url} -> {http_error};')
 
-            except ssl.SSLCertVerificationError:
-                failed_checks.append(f'{url} -> Проверка SSL сертификата завершилась неудачно.;')
+        except ssl.SSLCertVerificationError:
+            failed_checks.append(f'{url} -> Проверка SSL сертификата завершилась неудачно.;')
+
+    await asyncio.gather(*[check_one_site(name) for name in urls.keys()])
 
     time_now = datetime.now() + timedelta(hours=7)
 
