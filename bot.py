@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 from jobs.email_job import check_email_job
 from jobs.birthdays_job import SUBSCRIBE_HANDLER, UNSUBSCRIBE_HANDLER, check_birthdays
-from jobs.parser_job import check_sites, send_notifications_for_sites_checking, CHAT_ID
+from jobs.parser_job import check_sites, send_notifications_for_sites_checking, check_free_vps, CHAT_ID
 from jobs.DS_check_expiry_date import check_expiry_date_of_ds
 
 load_dotenv()
@@ -42,16 +42,17 @@ async def post_init(application: Application) -> None:
     #Сервер Telegram находится в часовом поясе UTC+7, значит нужно вычитать 7 часов из необходимого времени уведомления
     time_to_send_notification =  datetime.time(hour=5, minute=0, second=0)
     time_to_check_email = datetime.time(hour=0, minute=1, second=20)
-    time_to_check_ds_expiry_date = datetime.time(hour=2, minute=0, second=0)
+    time_to_check_birthdays = datetime.time(hour=2, minute=0, second=0)
 
     # application.job_queue.run_repeating(check_email_job, interval=3600, first=0)
     application.job_queue.run_daily(check_email_job, time_to_check_email)
     # application.job_queue.run_daily(check_expiry_date_of_ds, time_to_check_ds_expiry_date)
     application.job_queue.run_daily(notify_about_work_status, time_to_send_notification)
+    application.job_queue.run_daily(check_birthdays, time_to_check_birthdays)
 
-    application.job_queue.run_repeating(check_birthdays, interval=86400, first=0)
     application.job_queue.run_repeating(check_sites, interval=14400, first=0)
     application.job_queue.run_repeating(send_notifications_for_sites_checking, interval=14700, first=0)
+    application.job_queue.run_repeating(check_free_vps, interval=3600, first=0)
     # application.job_queue.run_repeating(send_notifications_for_sites_checking, interval=80, first=0)
 
     await set_commands(application)

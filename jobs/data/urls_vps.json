@@ -1,0 +1,32 @@
+{
+  "weasel_finland": {
+    "url": "https://my.weasel.cloud/store/standard-vps-finland",
+    "css-selectors": [["Io (1CPU, 1GB)", "#product91 > div.package-footer.package-side.package-side-right > div.package-qty"],
+      ["Calisto (2CPU, 2GB)", "#product92 > div.package-footer.package-side.package-side-right > div.package-qty"]]
+  },
+  "weasel_netherlands": {
+    "url": "https://my.weasel.cloud/store/standard-vps-netherlands",
+    "css-selectors": [["Io (1CPU, 1GB)", "#product48 > div.package-footer.package-side.package-side-right > div.package-qty"],
+      ["Calisto (2CPU, 2GB)","#product49 > div.package-footer.package-side.package-side-right > div.package-qty"]]
+  },
+  "weasel_france": {
+    "url": "https://my.weasel.cloud/store/standard-vps-france",
+    "css-selectors": [["Io (1CPU, 1GB)", "#product128 > div.package-footer.package-side.package-side-right > div.package-qty"],
+      ["Calisto (2CPU, 2GB)","#product129 > div.package-footer.package-side.package-side-right > div.package-qty"]]
+  },
+  "weasel_germany": {
+    "url": "https://my.weasel.cloud/store/standard-vps-germany",
+    "css-selectors": [["Io (1CPU, 1GB)","#product79 > div.package-footer.package-side.package-side-right > div.package-qty"],
+      ["Calisto (2CPU, 2GB)", "#product80 > div.package-footer.package-side.package-side-right > div.package-qty"]]
+  },
+  "weasel_sweden": {
+    "url": "https://my.weasel.cloud/store/vps-sweden",
+    "css-selectors": [["Io (1CPU, 1GB)","#product165 > div.package-footer.package-side.package-side-right > div.package-qty"],
+      ["Calisto (2CPU, 2GB)","#product166 > div.package-footer.package-side.package-side-right > div.package-qty"]]
+  },
+  "weasel_england": {
+    "url": "https://my.weasel.cloud/store/standard-vps-united-kingdom",
+    "css-selectors": [["Io (1CPU, 1GB)","#product103 > div.package-footer.package-side.package-side-right > div.package-qty"],
+      ["Calisto (2CPU, 2GB)","#product104 > div.package-footer.package-side.package-side-right > div.package-qty"]]
+  }
+}

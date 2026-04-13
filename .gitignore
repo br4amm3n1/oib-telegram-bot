@@ -10,3 +10,4 @@ __pycache__/
 .idea
 requirements.txt
 check_elements.py
+check_free_vps.py

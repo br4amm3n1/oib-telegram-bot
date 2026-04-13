@@ -31,10 +31,48 @@ def format_datetime_for_db(dt: datetime) -> str:
     return dt.strftime('%Y-%m-%d %H:%M:%S.%f')[:26]
 
 
+async def check_free_vps(context: CallbackContext) -> None:
+    '''
+    Для проверки наличия доступных для покупки VPS серверов на
+    weasel.cloud.
+    :param context: CallbackContext
+    :return: None
+    '''
+
+    urls = from_json("jobs/data/urls_vps.json")
+
+    async def check_one_vps_country(site_name: str) -> None:
+        url = urls.get(site_name).get('url')
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=HEADERS) as response:
+                    response.encoding = 'utf-8'
+                    html_page = await response.text()
+
+                    css_selectors = urls.get(site_name).get('css-selectors')
+
+                    soup = BeautifulSoup(html_page, 'lxml')
+
+                    for css_selector in css_selectors:
+                        result = soup.select(css_selector[1])
+
+                        inline_text = result[0].get_text(strip=True)
+                        free_count = inline_text[:inline_text.index(' ')]
+
+                        text = "На %s появились доступные 🖥 VPS (%s) в количестве %s шт." % (url, css_selector[0], free_count)
+
+                        if int(free_count) > 0:
+                            await context.bot.send_message(chat_id=CHAT_ID, text=text, disable_web_page_preview=True)
+        except Exception as ex:
+            logging.warning(f"{str(ex)}")
+
+    await asyncio.gather(*[check_one_vps_country(name) for name in urls.keys()])
+
 async def check_sites(context: CallbackContext) -> None:
     '''
     Для проверки веб-ресурсов, указанных в словарь URLS, на целостность.
-    Проверка осуществляется по заранее выбранным элементам DOM-структуры и сохраненным
+    Проверка осуществляется по заранее выбранным элементам и сохраненным
     в словарь URLS.
     :param context: CallbackContext
     :return: None
