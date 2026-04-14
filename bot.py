@@ -52,7 +52,7 @@ async def post_init(application: Application) -> None:
 
     application.job_queue.run_repeating(check_sites, interval=14400, first=0)
     application.job_queue.run_repeating(send_notifications_for_sites_checking, interval=14700, first=0)
-    application.job_queue.run_repeating(check_free_vps, interval=3600, first=0)
+    application.job_queue.run_repeating(check_free_vps, interval=900, first=0)
     # application.job_queue.run_repeating(send_notifications_for_sites_checking, interval=80, first=0)
 
     await set_commands(application)
